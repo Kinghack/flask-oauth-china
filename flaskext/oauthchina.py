@@ -17,7 +17,6 @@ from werkzeug import url_decode, url_encode, url_quote, \
 import oauth2
 import certifi
 
-host_url = "your url when applied your APP"
 
 _etree = None
 def get_etree():
@@ -175,6 +174,7 @@ class OAuthRemoteApp(object):
                  request_token_url,
                  access_token_url, authorize_url,
                  consumer_key, consumer_secret,
+                 host_url=None,
                  request_token_params=None,
                  access_token_params=None,
                  access_token_method='GET'):
@@ -191,6 +191,7 @@ class OAuthRemoteApp(object):
         self.request_token_params = request_token_params or {}
         self.access_token_params = access_token_params or {}
         self.access_token_method = access_token_method
+        self.host_url=host_url
         self._consumer = oauth2.Consumer(self.consumer_key,
                                          self.consumer_secret)
         self._client = OAuthClient(self._consumer)
@@ -319,7 +320,7 @@ class OAuthRemoteApp(object):
                 #                         url_quote(token),callback)
                 url = self.expand_url(self.authorize_url)+'?oauth_token=' + \
                                         url_quote(token)+'&oauth_callback=' +\
-                                        host_url + callback
+                                        self.host_url + callback
         else:
             assert callback is not None, 'Callback is required OAuth2'
             # This is for things like facebook's oauth.  Since we need the
@@ -334,7 +335,7 @@ class OAuthRemoteApp(object):
             #    #callback = "http://chuquwan.tk%s" % temp
             #both weibo, renren, qq need this
             temp = callback
-            callback = host_url + temp
+            callback = self.host_url + temp
             #
             params['redirect_uri'] = callback
             params['client_id'] = self.consumer_key
